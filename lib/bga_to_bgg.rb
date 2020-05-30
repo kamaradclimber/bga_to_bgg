@@ -14,11 +14,11 @@ module BgaToBgg
     def to_bgg(play)
       scores = play.scores.map do |bga_player, score|
         serialized_id = if KNOWN_BGG_USERS.key?(bga_player.to_sym)
-          bgg_player = KNOWN_BGG_USERS[bga_player.to_sym]
-          "#{bgg_player[:username]}/#{bga_player}/#{bgg_player[:id]}"
-        else
-          "/#{bga_player}/0"
-        end
+                          bgg_player = KNOWN_BGG_USERS[bga_player.to_sym]
+                          "#{bgg_player[:username]}/#{bga_player}/#{bgg_player[:id]}"
+                        else
+                          "/#{bga_player}/0"
+                        end
         [serialized_id, score]
       end.to_h
 
@@ -35,7 +35,7 @@ module BgaToBgg
     # values are { username: <bgg username>, id: <bgg user id> }
     KNOWN_BGG_USERS = {
       kamaradclimber: { username: 'kamaradclimber', id: 1003032 }
-    }
+    }.freeze
 
     KNOWN_GAMES = {
       notalone: 194879,

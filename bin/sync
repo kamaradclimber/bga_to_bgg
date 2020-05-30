@@ -7,8 +7,8 @@ bga = BgaToBgg::BGA::Client.new(username: ENV['BGA_USERNAME'], password: ENV['BG
 bgg = BgaToBgg::BGG::Client.new(username: ENV['BGG_USERNAME'], password: ENV['BGG_PASSWORD'])
 converter = BgaToBgg::BgaGameToBggGame.new
 
-#bga_plays = bga.history
-#_ = bga_plays.map { |play| converter.to_bgg(play) }
+# bga_plays = bga.history
+# _ = bga_plays.map { |play| converter.to_bgg(play) }
 
 bgg.plays(game_id: 194879)
 

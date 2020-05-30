@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'json'
 require 'httpclient'
 
@@ -22,7 +24,7 @@ module BgaToBgg
         response.content
       end
 
-      BGG_URL = 'https://boardgamegeek.com'.freeze
+      BGG_URL = 'https://boardgamegeek.com'
 
       DEFAULT_HEADERS = {
         'User-Agent': 'BGA to BGG. Contact grego_bgatobgg@familleseux.net if needed',
@@ -54,7 +56,7 @@ module BgaToBgg
 
     # A small wrapper around one single play
     class LoggedPlay
-      # @param :name [String] name of the game played
+      # @param :id [Integer] name of the game played
       # @param :scores [Hash] for each player key, their score as value
       # @param :duration_mins [Integer] duration of the play in minutes
       # @param :time [Time] time of the play
@@ -78,15 +80,23 @@ module BgaToBgg
         end.to_h
 
         LoggedPlay.new(
-          game_id: hash['item'].first['objectid'],
+          game_id: hash['item'].first['objectid'].to_i,
           duration_mins: hash['length'].to_i,
           time: Time.parse(hash['date']),
-          scores: scores,
+          scores: scores
         )
       end
 
+      def ==(other)
+        to_json == other.to_json
+      end
+
+      def eql?(other)
+        self == other
+      end
+
       # @return [String] the json format of the logged play
-      def to_json
+      def to_json(*_args)
         to_h.to_json
       end
 
@@ -109,11 +119,11 @@ module BgaToBgg
           players: []
         }
         @scores.each do |serialized_id, score|
-          player_username, player_name, player_id = serialized_id.split('/', 3)
+          player_username, player_name, player_id = serialized_id.to_s.split('/', 3)
           hash[:players] << {
             username: player_username,
             userid: player_id.to_i,
-            score: score,
+            score: score.to_i,
             repeat: 'true',
             name: player_name,
             win: score.to_i == @scores.values.map(&:to_i).max,
