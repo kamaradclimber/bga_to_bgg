@@ -1,7 +1,10 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
 require 'bga_to_bgg'
 
-bga = BgaToBgg::BgaClient.new(username: ENV['BGA_USERNAME'], password: ENV['BGA_PASSWORD'], player_id: ENV['BGA_PLAYER_ID'])
+bga = BgaToBgg::BGA::Client.new(username: ENV['BGA_USERNAME'], password: ENV['BGA_PASSWORD'], player_id: ENV['BGA_PLAYER_ID'])
 
-puts bga.history
+bga.history.each do |play|
+  puts play.inspect
+end
