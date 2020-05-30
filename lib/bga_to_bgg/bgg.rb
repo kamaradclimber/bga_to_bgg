@@ -69,8 +69,6 @@ module BgaToBgg
       # @param [Hash] a hash describing the logged play. It must follow format of boardgamegeek /xmlapi2/plays api
       # @return [LoggedPlay]
       def self.from_h(hash)
-        # {"id"=>"37108160", "date"=>"2019-08-10", "quantity"=>"1", "length"=>"5", "incomplete"=>"0", "nowinstats"=>"0", "location"=>"Saint Pierre Des Ormes", "item"=>[{"name"=>"Codenames", "objecttype"=>"thing", "objectid"=>"178900", "subtypes"=>[{"subtype"=>[{"value"=>"boardgame"}, {"value"=>"boardgameintegration"}]}]}], "players"=>[{"player"=>[{"username"=>"kamaradclimber", "userid"=>"1003032", "name"=>"kamaradclimber", "startposition"=>"1", "color"=>"", "score"=>"", "new"=>"0", "rating"=>"0", "win"=>"0"}, {"username"=>"", "userid"=>"0", "name"=>"Noemi", "startposition"=>"2", "color"=>"", "score"=>"", "new"=>"0", "rating"=>"0", "win"=>"1"}, {"username"=>"", "userid"=>"0", "name"=>"Séverin", "startposition"=>"3", "color"=>"", "score"=>"", "new"=>"0", "rating"=>"0", "win"=>"0"}, {"username"=>"", "userid"=>"0", "name"=>"Raphaelle", "startposition"=>"4", "color"=>"", "score"=>"", "new"=>"0", "rating"=>"0", "win"=>"1"}, {"username"=>"", "userid"=>"0", "name"=>"Camille Seux", "startposition"=>"5", "color"=>"", "score"=>"", "new"=>"0", "rating"=>"0", "win"=>"1"}]}]}
-
         # for a weird reason the format for players is an array of size 1
         raise 'players value should be an array of size 1' unless hash['players'].size == 1
 
@@ -110,13 +108,14 @@ module BgaToBgg
           ajax: 1,
           players: []
         }
-        @scores.each do |player, score|
+        @scores.each do |serialized_id, score|
+          player_username, player_name, player_id = serialized_id.split('/', 3)
           hash[:players] << {
-            username: '',
-            userid: 0,
+            username: player_username,
+            userid: player_id.to_i,
             score: score,
             repeat: 'true',
-            name: player,
+            name: player_name,
             win: score.to_i == @scores.values.map(&:to_i).max,
             selected: 'false'
           }

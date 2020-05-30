@@ -10,7 +10,7 @@ converter = BgaToBgg::BgaGameToBggGame.new
 #bga_plays = bga.history
 #_ = bga_plays.map { |play| converter.to_bgg(play) }
 
-bgg.plays(game_id: 178900)
+bgg.plays(game_id: 194879)
 
 # play = BgaToBgg::BGG::LoggedPlay.new(
 #   game_id: 194879,
