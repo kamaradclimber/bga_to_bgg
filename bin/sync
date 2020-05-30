@@ -7,10 +7,25 @@ bga = BgaToBgg::BGA::Client.new(username: ENV['BGA_USERNAME'], password: ENV['BG
 bgg = BgaToBgg::BGG::Client.new(username: ENV['BGG_USERNAME'], password: ENV['BGG_PASSWORD'])
 converter = BgaToBgg::BgaGameToBggGame.new
 
-# bga_plays = bga.history
-# _ = bga_plays.map { |play| converter.to_bgg(play) }
+bga_plays = bga.history
 
-bgg.plays(game_id: 194879)
+bga_plays.group_by(&:name).each do |game_name, bga_plays_for_this_game|
+  next unless game_name == 'cantstop'
+  bgg_plays_from_bga = bga_plays_for_this_game.map { |play| converter.to_bgg(play) }
+  game_id = bgg_plays_from_bga.first.game_id
+  puts "Considering game #{game_name} (bgg id: #{game_id})"
+  existing_bgg_plays = bgg.plays(game_id: game_id)
+  puts "Found #{existing_bgg_plays.size} logged games on BGG"
+  non_bga_plays = existing_bgg_plays - bgg_plays_from_bga
+  to_add_plays = bgg_plays_from_bga - existing_bgg_plays
+  puts "Found #{non_bga_plays.size} plays BGG plays recorded through the app and #{to_add_plays.size} plays from BGA to add to BGG"
+
+  to_add_plays.each do |play|
+    bgg.log_play(play)
+    puts "Logged play of #{game_name} from #{play.time} with #{play.scores.keys.join(', ')} to BGG"
+  end
+end
+
 
 # play = BgaToBgg::BGG::LoggedPlay.new(
 #   game_id: 194879,

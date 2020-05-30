@@ -45,8 +45,8 @@ module BgaToBgg
         response_content = http_client.get_content(File.join(BGG_URL, 'xmlapi2/plays'), { username: @username, type: 'thing', id: game_id, page: page })
 
         xml = XmlSimple.xml_in(response_content)
-        current_plays = xml['play'].map { |p| LoggedPlay.from_h(p) }
-        if xml['play'].size == 100
+        current_plays = xml['play']&.map { |p| LoggedPlay.from_h(p) } || []
+        if xml['play']&.size == 100
           plays(game_id: game_id, page: page + 1, previous_plays: previous_plays + current_plays)
         else
           previous_plays + current_plays
@@ -56,7 +56,7 @@ module BgaToBgg
 
     # A small wrapper around one single play
     class LoggedPlay
-      # @param :id [Integer] name of the game played
+      # @param :game_id [Integer] name of the game played
       # @param :scores [Hash] for each player key, their score as value
       # @param :duration_mins [Integer] duration of the play in minutes
       # @param :time [Time] time of the play
@@ -66,6 +66,8 @@ module BgaToBgg
         @duration_mins = duration_mins.to_i
         @time = time
       end
+
+      attr_reader :game_id, :scores, :duration_mins, :time
 
       # Build a [LoggedPlay] using a logged play returned by /xmlapi2/plays api (see https://boardgamegeek.com/wiki/page/BGG_XML_API2)
       # @param [Hash] a hash describing the logged play. It must follow format of boardgamegeek /xmlapi2/plays api
