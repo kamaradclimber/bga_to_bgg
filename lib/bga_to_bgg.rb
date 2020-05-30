@@ -14,7 +14,7 @@ module BgaToBgg
     def to_bgg(play)
       scores = play.scores.map do |bga_player, score|
         serialized_id = to_bgg_player_id(bga_player)
-        [serialized_id, score]
+        [serialized_id, score.to_i]
       end.to_h
 
       BGG::LoggedPlay.new(
@@ -48,7 +48,8 @@ module BgaToBgg
       griseya: { username: '', id: 0, name: 'Nathalie' },
       ngrisey: { username: '', id: 0, name: 'Anthony' }, # yes pseudo are reversed
       LeBuveur: { username: '', id: 0, name: 'Nicolas Grégis' },
-      k0ral: { username: '', id: 0, name: 'Chahine' },
+      kOral: { username: '', id: 0, name: 'Chahine' },
+      Wahoo2011: { username: '', id: 0, name: 'Chris' },
     }.freeze
 
     KNOWN_GAMES = {

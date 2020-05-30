@@ -90,8 +90,9 @@ module BgaToBgg
       end
 
       def ==(other)
-        ignored_keys = %i[comment dateinput players]
+        ignored_keys = %i[comments dateinput players time]
         return false unless to_h.reject { |k, _| ignored_keys.include?(k) } == other.to_h.reject { |k, _| ignored_keys.include?(k) }
+        return false unless time.strftime('%F') == other.time.strftime('%F')
 
         to_h[:players].sort_by { |el| el[:name] } == other.to_h[:players].sort_by { |el| el[:name] }
       end
