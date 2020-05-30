@@ -90,7 +90,9 @@ module BgaToBgg
       end
 
       def ==(other)
-        to_json == other.to_json
+        ignored_keys = [:comment, :dateinput, :players]
+        return false unless to_h.reject { |k,_| ignored_keys.include?(k) } == other.to_h.reject { |k,_| ignored_keys.include?(k) }
+        to_h[:players].sort_by { |el| el[:name] } == other.to_h[:players].sort_by { |el| el[:name] }
       end
 
       def eql?(other)
