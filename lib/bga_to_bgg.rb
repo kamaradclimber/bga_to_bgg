@@ -13,12 +13,7 @@ module BgaToBgg
     # @return [BGG::LoggedPlay]
     def to_bgg(play)
       scores = play.scores.map do |bga_player, score|
-        serialized_id = if KNOWN_BGG_USERS.key?(bga_player.to_sym)
-                          bgg_player = KNOWN_BGG_USERS[bga_player.to_sym]
-                          "#{bgg_player[:username]}/#{bga_player}/#{bgg_player[:id]}"
-                        else
-                          "/#{bga_player}/0"
-                        end
+        serialized_id = to_bgg_player_id(bga_player)
         [serialized_id, score]
       end.to_h
 
@@ -31,10 +26,29 @@ module BgaToBgg
 
     private
 
+    # @param bga_player [String,Symbol] the BGA nickname
+    # @return [String] a BGG serialized id
+    def to_bgg_player_id(bga_player)
+      if KNOWN_BGG_USERS.key?(bga_player.to_sym)
+        bgg_player = KNOWN_BGG_USERS[bga_player.to_sym]
+        "#{bgg_player[:username]}/#{bgg_player[:name] || bga_player}/#{bgg_player[:id]}"
+      else
+        "/#{bga_player}/0"
+      end
+    end
+
     # keys are BGA identifier
     # values are { username: <bgg username>, id: <bgg user id> }
     KNOWN_BGG_USERS = {
-      kamaradclimber: { username: 'kamaradclimber', id: 1003032 }
+      kamaradclimber: { username: 'kamaradclimber', id: 1003032 },
+      tchouktchouka: { username: '', id: 0, name: 'Noemi' },
+      FloSeux: { username: '', id: 0, name: 'Florentin' },
+      sevsevsev: { username: '', id: 0, name: 'Séverin' },
+      Léovirus: { username: '', id: 0, name: 'Éléonore' },
+      griseya: { username: '', id: 0, name: 'Nathalie' },
+      ngrisey: { username: '', id: 0, name: 'Anthony' }, # yes pseudo are reversed
+      LeBuveur: { username: '', id: 0, name: 'Nicolas Grégis' },
+      k0ral: { username: '', id: 0, name: 'Chahine' },
     }.freeze
 
     KNOWN_GAMES = {

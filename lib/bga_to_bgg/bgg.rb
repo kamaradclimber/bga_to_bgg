@@ -109,7 +109,7 @@ module BgaToBgg
       def to_h
         hash = {
           playdate: @time.strftime('%F'),
-          comments: "logged by BGA-To-BGG on #{Time.now}",
+          comments: "logged by BGA-To-BGG for game started on #{@time.to_i}",
           length: @duration_mins,
           minutes: @duration_mins,
           hours: 0,
