@@ -36,6 +36,20 @@ module BgaToBgg
           raise "Incorrect status #{response.status}" unless (200..299).include?(response.status.to_i)
         end
       end
+
+      def plays(game_id:, page: 1, previous_plays: [])
+        require 'xmlsimple'
+
+        response_content = http_client.get_content(File.join(BGG_URL, 'xmlapi2/plays'), { username: @username, type: 'thing', id: game_id, page: page })
+
+        xml = XmlSimple.xml_in(response_content)
+        current_plays = xml['play'].map { |p| LoggedPlay.from_h(p) }
+        if xml['play'].size == 100
+          plays(game_id: game_id, page: page + 1, previous_plays: previous_plays + current_plays)
+        else
+          previous_plays + current_plays
+        end
+      end
     end
 
     # A small wrapper around one single play
@@ -47,8 +61,30 @@ module BgaToBgg
       def initialize(game_id:, scores:, duration_mins:, time:)
         @game_id = game_id
         @scores = scores
-        @duration_mins = duration_mins
+        @duration_mins = duration_mins.to_i
         @time = time
+      end
+
+      # Build a [LoggedPlay] using a logged play returned by /xmlapi2/plays api (see https://boardgamegeek.com/wiki/page/BGG_XML_API2)
+      # @param [Hash] a hash describing the logged play. It must follow format of boardgamegeek /xmlapi2/plays api
+      # @return [LoggedPlay]
+      def self.from_h(hash)
+        # {"id"=>"37108160", "date"=>"2019-08-10", "quantity"=>"1", "length"=>"5", "incomplete"=>"0", "nowinstats"=>"0", "location"=>"Saint Pierre Des Ormes", "item"=>[{"name"=>"Codenames", "objecttype"=>"thing", "objectid"=>"178900", "subtypes"=>[{"subtype"=>[{"value"=>"boardgame"}, {"value"=>"boardgameintegration"}]}]}], "players"=>[{"player"=>[{"username"=>"kamaradclimber", "userid"=>"1003032", "name"=>"kamaradclimber", "startposition"=>"1", "color"=>"", "score"=>"", "new"=>"0", "rating"=>"0", "win"=>"0"}, {"username"=>"", "userid"=>"0", "name"=>"Noemi", "startposition"=>"2", "color"=>"", "score"=>"", "new"=>"0", "rating"=>"0", "win"=>"1"}, {"username"=>"", "userid"=>"0", "name"=>"Séverin", "startposition"=>"3", "color"=>"", "score"=>"", "new"=>"0", "rating"=>"0", "win"=>"0"}, {"username"=>"", "userid"=>"0", "name"=>"Raphaelle", "startposition"=>"4", "color"=>"", "score"=>"", "new"=>"0", "rating"=>"0", "win"=>"1"}, {"username"=>"", "userid"=>"0", "name"=>"Camille Seux", "startposition"=>"5", "color"=>"", "score"=>"", "new"=>"0", "rating"=>"0", "win"=>"1"}]}]}
+
+        # for a weird reason the format for players is an array of size 1
+        raise 'players value should be an array of size 1' unless hash['players'].size == 1
+
+        scores = hash['players'].first['player'].map do |player|
+          serialized_id = "#{player['username']}/#{player['name']}/#{player['userid']}"
+          [serialized_id, player['score'].to_i]
+        end.to_h
+
+        LoggedPlay.new(
+          game_id: hash['item'].first['objectid'],
+          duration_mins: hash['length'].to_i,
+          time: Time.parse(hash['date']),
+          scores: scores,
+        )
       end
 
       # @return [String] the json format of the logged play
