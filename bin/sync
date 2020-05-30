@@ -1,0 +1,7 @@
+#!/usr/bin/env ruby
+
+require 'bga_to_bgg'
+
+bga = BgaToBgg::BgaClient.new(username: ENV['BGA_USERNAME'], password: ENV['BGA_PASSWORD'], player_id: ENV['BGA_PLAYER_ID'])
+
+puts bga.history
