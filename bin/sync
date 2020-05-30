@@ -20,7 +20,7 @@ bga_plays.group_by(&:name).each do |game_name, bga_plays_for_this_game|
   puts "Found #{non_bga_plays.size} plays BGG plays recorded through the app and #{to_add_plays.size} plays from BGA to add to BGG"
 
   to_add_plays.each do |play|
-    #bgg.log_play(play)
+    bgg.log_play(play)
     puts "Logged play of #{game_name} from #{play.time} with #{play.scores.keys.join(', ')} to BGG"
   end
 end
