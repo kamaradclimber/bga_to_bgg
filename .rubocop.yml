@@ -6,3 +6,6 @@ Layout/LineLength:
 
 Metrics/MethodLength:
   Max: 50
+
+Style/NumericLiterals:
+  Enabled: false

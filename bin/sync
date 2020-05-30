@@ -4,20 +4,20 @@
 require 'bga_to_bgg'
 
 bga = BgaToBgg::BGA::Client.new(username: ENV['BGA_USERNAME'], password: ENV['BGA_PASSWORD'], player_id: ENV['BGA_PLAYER_ID'])
-
-#bga.history.each do |play|
-#  puts play.inspect
-#end
-
 bgg = BgaToBgg::BGG::Client.new(username: ENV['BGG_USERNAME'], password: ENV['BGG_PASSWORD'])
+converter = BgaToBgg::BgaGameToBggGame.new
 
-play = BgaToBgg::BGG::LoggedPlay.new(
-  game_id: 194879,
-  scores: {
-    kamaradclimber: 0,
-    noemi: -2
-  },
-  duration_mins: 30,
-  time: Time.now
-)
-bgg.log_play(play)
+bga_plays = bga.history
+_ = bga_plays.map { |play| converter.to_bgg(play) }
+
+
+# play = BgaToBgg::BGG::LoggedPlay.new(
+#   game_id: 194879,
+#   scores: {
+#     kamaradclimber: 0,
+#     noemi: -2
+#   },
+#   duration_mins: 30,
+#   time: Time.now
+# )
+# bgg.log_play(play)

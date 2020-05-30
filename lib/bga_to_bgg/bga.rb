@@ -68,6 +68,8 @@ module BgaToBgg
         @duration_mins = duration_mins
         @time = time
       end
+
+      attr_reader :name, :scores, :duration_mins, :time
     end
   end
 end
