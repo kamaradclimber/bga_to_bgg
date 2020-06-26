@@ -29,6 +29,8 @@ module BgaToBgg
     # @param bga_player [String,Symbol] the BGA nickname
     # @return [String] a BGG serialized id
     def to_bgg_player_id(bga_player)
+      # bgg normalize player name by stripping trailing whitespace
+      bga_player = bga_player.strip
       if KNOWN_BGG_USERS.key?(bga_player.to_sym)
         bgg_player = KNOWN_BGG_USERS[bga_player.to_sym]
         "#{bgg_player[:username]}/#{bgg_player[:name] || bga_player}/#{bgg_player[:id]}"
