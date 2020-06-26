@@ -61,7 +61,9 @@ module BgaToBgg
       dudo: 45,
       taluva: 24508,
       coupcitystate: 131357,
+      tobago: 42215,
       saboteur: 9220,
+      rallymangt: 256589,
       cantstop: 41
     }.freeze
 
