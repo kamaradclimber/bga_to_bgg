@@ -51,7 +51,7 @@ module BgaToBgg
       ngrisey: { username: '', id: 0, name: 'Anthony' }, # yes pseudo are reversed
       LeBuveur: { username: '', id: 0, name: 'Nicolas Grégis' },
       kOral: { username: '', id: 0, name: 'Chahine' },
-      Wahoo2011: { username: '', id: 0, name: 'Chris' },
+      Wahoo2011: { username: '', id: 0, name: 'Chris' }
     }.freeze
 
     KNOWN_GAMES = {

@@ -24,6 +24,20 @@ module BgaToBgg
         response.content
       end
 
+      # @param [BGG::LoggedPlay] a game play to delete
+      # @return [String] html returned by boardgamegeek
+      def delete_play(play)
+        uri = File.join(BGG_URL, 'geekplay.php')
+
+        data = { action: 'delete', finalize: '1', B1: 'yes', playid: play.id }
+        response = http_client.post(uri, data.to_json, DEFAULT_HEADERS)
+        # the BGG api returns a 302 on delete
+        raise "Incorrect status #{response.status}" unless response.status.to_i == 302
+
+        # content is some html output. We don't really need it
+        response.content
+      end
+
       BGG_URL = 'https://boardgamegeek.com'
 
       DEFAULT_HEADERS = {
@@ -56,18 +70,20 @@ module BgaToBgg
 
     # A small wrapper around one single play
     class LoggedPlay
+      # @param :id [Integer, String] id of the play. Optional
       # @param :game_id [Integer] name of the game played
       # @param :scores [Hash] for each player key, their score as value
       # @param :duration_mins [Integer] duration of the play in minutes
       # @param :time [Time] time of the play
-      def initialize(game_id:, scores:, duration_mins:, time:)
+      def initialize(id: nil, game_id:, scores:, duration_mins:, time:)
+        @id = id
         @game_id = game_id
         @scores = scores
         @duration_mins = duration_mins.to_i
         @time = time
       end
 
-      attr_reader :game_id, :scores, :duration_mins, :time
+      attr_reader :id, :game_id, :scores, :duration_mins, :time
 
       # Build a [LoggedPlay] using a logged play returned by /xmlapi2/plays api (see https://boardgamegeek.com/wiki/page/BGG_XML_API2)
       # @param [Hash] a hash describing the logged play. It must follow format of boardgamegeek /xmlapi2/plays api
@@ -82,6 +98,7 @@ module BgaToBgg
         end.to_h
 
         LoggedPlay.new(
+          id: hash['id'],
           game_id: hash['item'].first['objectid'].to_i,
           duration_mins: hash['length'].to_i,
           time: Time.parse(hash['date']),
@@ -90,7 +107,7 @@ module BgaToBgg
       end
 
       def ==(other)
-        ignored_keys = %i[comments dateinput players time]
+        ignored_keys = %i[id comments dateinput players time]
         return false unless to_h.reject { |k, _| ignored_keys.include?(k) } == other.to_h.reject { |k, _| ignored_keys.include?(k) }
         return false unless time.strftime('%F') == other.time.strftime('%F')
 
