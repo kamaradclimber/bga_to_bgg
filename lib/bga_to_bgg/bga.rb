@@ -43,7 +43,10 @@ module BgaToBgg
         response = http_client.get(uri, query, headers)
         raise "Incorrect status #{response.status}" unless response.status.to_i == 200
 
-        tables = JSON.parse(response.content)['data']['tables']
+        json_response = JSON.parse(response.content)
+        raise "Incorrect data from BGA: #{json_response['error']}" if json_response['error']
+
+        tables = json_response['data']['tables']
         return previous_pages unless tables.any?
 
         _history(page: page + 1, previous_pages: previous_pages + tables)
