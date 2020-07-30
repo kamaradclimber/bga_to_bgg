@@ -97,6 +97,12 @@ module BgaToBgg
         to_h[:players].sort_by { |el| el[:name] } == other.to_h[:players].sort_by { |el| el[:name] }
       end
 
+      def hash
+        h1 = to_h[:players].sort_by { |el| el[:name] }.hash
+        h2 = time.strftime('%F').hash
+        h1 ^ h2
+      end
+
       def eql?(other)
         self == other
       end
