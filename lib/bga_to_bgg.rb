@@ -66,6 +66,8 @@ module BgaToBgg
       tobago: 42215,
       saboteur: 9220,
       rallymangt: 256589,
+      sobek: 67185,
+      roomtwentyfive: 127024,
       cantstop: 41
     }.freeze
 
