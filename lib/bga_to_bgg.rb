@@ -48,30 +48,20 @@ module BgaToBgg
                  end
     end
 
-    KNOWN_GAMES = {
-      notalone: 194879,
-      coltexpress: 158899,
-      sechsnimmt: 432,
-      sevenwonders: 68448,
-      sushigo: 133473,
-      dudo: 45,
-      taluva: 24508,
-      coupcitystate: 131357,
-      tobago: 42215,
-      saboteur: 9220,
-      rallymangt: 256589,
-      sobek: 67185,
-      roomtwentyfive: 127024,
-      cantstop: 41
-    }.freeze
+    def known_games
+      @known_games ||= begin
+                         game_file = ENV['GAME_FILE'] || 'games.json'
+                         JSON.parse(File.read(game_file))
+                       end
+    end
 
     # @return [Integer] the BGG id of the game if known
     # @raise [UnknownGame] if game is unknown
     def bga_name_to_bgg_id(name)
-      raise UnknownGame, "#{name} game on BGA is unknown" unless KNOWN_GAMES.key?(name.to_sym)
+      raise UnknownGame, "#{name} game on BGA is unknown" unless known_games.key?(name)
 
       # TODO(g.seux): of course we should fetch that info dynamically, but how?
-      KNOWN_GAMES[name.to_sym]
+      known_games[name]
     end
   end
 end
