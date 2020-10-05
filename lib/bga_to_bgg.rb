@@ -31,28 +31,22 @@ module BgaToBgg
     def to_bgg_player_id(bga_player)
       # bgg normalize player name by stripping trailing whitespace
       bga_player = bga_player.strip
-      if KNOWN_BGG_USERS.key?(bga_player.to_sym)
-        bgg_player = KNOWN_BGG_USERS[bga_player.to_sym]
-        "#{bgg_player[:username]}/#{bgg_player[:name] || bga_player}/#{bgg_player[:id]}"
+      if known_bgg_users.key?(bga_player.to_s)
+        bgg_player = known_bgg_users[bga_player.to_s]
+        "#{bgg_player['username']}/#{bgg_player['name'] || bga_player}/#{bgg_player['id']}"
       else
         "/#{bga_player}/0"
       end
     end
 
-    # keys are BGA identifier
-    # values are { username: <bgg username>, id: <bgg user id> }
-    KNOWN_BGG_USERS = {
-      kamaradclimber: { username: 'kamaradclimber', id: 1003032 },
-      tchouktchouka: { username: '', id: 0, name: 'Noemi' },
-      FloSeux: { username: '', id: 0, name: 'Florentin' },
-      sevsevsev: { username: '', id: 0, name: 'Séverin' },
-      Léovirus: { username: '', id: 0, name: 'Éléonore' },
-      griseya: { username: '', id: 0, name: 'Nathalie' },
-      ngrisey: { username: '', id: 0, name: 'Anthony' }, # yes pseudo are reversed
-      LeBuveur: { username: '', id: 0, name: 'Nicolas Grégis' },
-      kOral: { username: '', id: 0, name: 'Chahine' },
-      Wahoo2011: { username: '', id: 0, name: 'Chris' }
-    }.freeze
+    def known_bgg_users
+      # keys are BGA identifier
+      # values are { username: <bgg username>, id: <bgg user id> }
+      @known_bgg_users ||= begin
+                   users_file = ENV['USERS_FILE']
+                   JSON.parse(File.read(users_file))
+                 end
+    end
 
     KNOWN_GAMES = {
       notalone: 194879,
