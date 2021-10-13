@@ -57,6 +57,7 @@ module BgaToBgg
       def http_client
         @http_client ||= HTTPClient.new.tap do |c|
           c.set_auth(BGA_URL, @username, @password)
+          c.ssl_config.set_default_paths # https://github.com/nahi/httpclient/issues/445
         end
       end
     end
